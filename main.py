@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from Crypto.Cipher import AES
 from mysqldb_func import *
 from str_func import *
+from knn import *
 from nltk.corpus import stopwords
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -71,19 +72,25 @@ def main():
     "We can see the shining sun, the bright sun"
     )
     documents = texts.values()
+    documents = [doc for doc in documents if doc != '']
     tfidf_vectorizer = TfidfVectorizer(tokenizer=tokenize)
     tfidf_vect = TfidfVectorizer()
     #calculate tfidf matrix
     tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
-    tfidf_matrix2 = tfidf_vect.fit_transform(documents)
-    print tfidf_matrix.shape
-    print tfidf_matrix2.shape
-    print cosine_similarity(tfidf_matrix[0:1], tfidf_matrix)
+    #tfidf_matrix2 = tfidf_vect.fit_transform(documents)
+    #print tfidf_matrix.shape
+    #print tfidf_matrix2.shape
+    #print cosine_similarity(tfidf_matrix[0:1], tfidf_matrix)
     def getCosSim(idoc):
-        cosine_similarity(tfidf_matrix[idoc:idoc+1], tfidf_matrix)
+            return cosine_similarity(tfidf_matrix[idoc:idoc+1], tfidf_matrix)
 
-    for i in range(1,len(texts)):
+    knn = []
+    knndist = []
+    for i in range(0,len(documents)):
         print getCosSim(i)
+        returns = getNeighbors(getCosSim(i), 10)
+        knn.append(returns[0])
+        knndist.append(returns[1])
 
     str2 = 'syntes licens historien'
     response = tfidf_matrix.transform([str2])
